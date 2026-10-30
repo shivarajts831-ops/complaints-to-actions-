@@ -1,0 +1,950 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Complaints to Action</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100,700..900;112,700..900&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: a municipal front desk. Ink header rail, cool paper ground, white work surfaces.
+   Report page = form beside a live analysis panel. Admin page reads summary -> map -> charts -> queue. */
+:root{
+  --bg:#EBEFF3; --surface:#FFFFFF; --surface-2:#F4F6F9; --ink:#111A24; --ink-2:#475667; --ink-3:#6B7A8A;
+  --line:#D3DAE2; --line-2:#E4E9EF; --accent:#1646C8; --accent-ink:#FFFFFF; --accent-soft:#E3EBFF;
+  --rail:#101A27; --rail-ink:#EAF0F7; --rail-dim:#9FB0C3;
+  --crit:#C1272D; --crit-soft:#FBE5E5; --high:#B85410; --high-soft:#FCEBDD; --med:#8A5F00; --med-soft:#FAF0D2; --low:#25704A; --low-soft:#DDF1E5;
+  --s1:#2a78d6; --s2:#eb6834; --heat:#E5484D; --muted:#898781;
+  --st1:#86b6ef; --st2:#5598e7; --st3:#2a78d6; --st4:#1c5cab; --st5:#104281; --st6:#B8BEC6;
+  --map-land:#E9EEE8; --map-water:#BCD6EE; --map-road:#FFFFFF; --map-road-edge:#CBD3DB; --map-park:#CFE6CF; --map-label:#33424F; --map-rail:#8B97A3;
+  --grid:#E1E0D9; --axis:#C3C2B7;
+  --f-display:'Archivo',system-ui,'Segoe UI',Arial,sans-serif; --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif; --f-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C121A; --surface:#141C26; --surface-2:#1A2430; --ink:#E7EDF4; --ink-2:#A9B6C4; --ink-3:#8190A0;
+    --line:#2A3644; --line-2:#1F2A36; --accent:#7BA2FF; --accent-ink:#0A1426; --accent-soft:#1B2A4D;
+    --rail:#070C12; --rail-ink:#E7EDF4; --rail-dim:#8190A0;
+    --crit:#FF7B7F; --crit-soft:#3A1A1D; --high:#FF9A5C; --high-soft:#3A2514; --med:#E8B84A; --med-soft:#33290F; --low:#5FD08F; --low-soft:#12301F;
+    --s1:#3987e5; --s2:#d95926; --heat:#FF6B6B; --muted:#898781;
+    --st1:#184f95; --st2:#256abf; --st3:#3987e5; --st4:#6da7ec; --st5:#9ec5f4; --st6:#4A5563;
+    --map-land:#162029; --map-water:#1C3550; --map-road:#2A3745; --map-road-edge:#202B37; --map-park:#17301F; --map-label:#B7C4D1; --map-rail:#5F6D7B;
+    --grid:#2c2c2a; --axis:#383835; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C121A; --surface:#141C26; --surface-2:#1A2430; --ink:#E7EDF4; --ink-2:#A9B6C4; --ink-3:#8190A0;
+  --line:#2A3644; --line-2:#1F2A36; --accent:#7BA2FF; --accent-ink:#0A1426; --accent-soft:#1B2A4D;
+  --rail:#070C12; --rail-ink:#E7EDF4; --rail-dim:#8190A0;
+  --crit:#FF7B7F; --crit-soft:#3A1A1D; --high:#FF9A5C; --high-soft:#3A2514; --med:#E8B84A; --med-soft:#33290F; --low:#5FD08F; --low-soft:#12301F;
+  --s1:#3987e5; --s2:#d95926; --heat:#FF6B6B; --muted:#898781;
+  --st1:#184f95; --st2:#256abf; --st3:#3987e5; --st4:#6da7ec; --st5:#9ec5f4; --st6:#4A5563;
+  --map-land:#162029; --map-water:#1C3550; --map-road:#2A3745; --map-road-edge:#202B37; --map-park:#17301F; --map-label:#B7C4D1; --map-rail:#5F6D7B;
+  --grid:#2c2c2a; --axis:#383835; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--rail);z-index:30}
+h1,h2,h3{font-family:var(--f-display);font-stretch:112%;font-weight:800;letter-spacing:-.01em;line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:clamp(28px,4.6vw,46px)} h2{font-size:clamp(18px,2.2vw,22px)} h3{font-size:16px}
+p{margin:0} a{color:var(--accent)} button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:1200px;margin-inline:auto}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.kicker{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.muted{color:var(--ink-3)} .small{font-size:13px} .fine{font-size:12px;color:var(--ink-3)}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--rail);color:var(--rail-ink);margin-inline:calc(-1 * max(16px,env(safe-area-inset-left,0px))) calc(-1 * max(16px,env(safe-area-inset-right,0px)));padding-inline:max(16px,env(safe-area-inset-left,0px)) max(16px,env(safe-area-inset-right,0px))}
+.bar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px 20px;padding-block:10px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;min-width:0}
+.brand-mark{width:30px;height:30px;flex:none}
+.brand b{font-family:var(--f-display);font-stretch:112%;font-weight:800;font-size:17px;letter-spacing:-.005em;display:block;line-height:1.1}
+.brand span{font-size:11px;color:var(--rail-dim);display:block}
+.tabs{display:flex;gap:4px}
+.tabs a{color:var(--rail-dim);text-decoration:none;padding:8px 14px;border-radius:6px;font-weight:600;font-size:14px}
+.tabs a:hover{color:var(--rail-ink)}
+.tabs a[aria-current="page"]{background:var(--rail-ink);color:var(--rail)}
+main{padding-block:28px 40px;min-height:70vh}
+
+/* surfaces and controls */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:20px;min-width:0}
+.split{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start}
+.intro{display:grid;gap:10px;margin-bottom:22px;max-width:760px}
+.lede{color:var(--ink-2);font-size:16px;max-width:62ch}
+form{display:grid;gap:16px}
+.field{display:grid;gap:6px;min-width:0}
+.field>label,.label{font-weight:600;font-size:13px}
+.hint{font-size:12px;color:var(--ink-3)}
+input[type=text],input[type=search],select,textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;padding:10px 12px;min-height:42px}
+textarea{resize:vertical;min-height:120px}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:9px 16px;min-height:42px;font-weight:600;cursor:pointer;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.small{min-height:34px;padding:5px 12px;font-size:13px}
+.btn.danger{color:var(--crit)}
+.btns{display:flex;flex-wrap:wrap;gap:10px}
+.link{background:none;border:0;padding:0;color:var(--accent);font-family:var(--f-mono);font-weight:500;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.photo-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.thumb{width:84px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--line)}
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 10px 2px 8px;border-radius:999px;font-size:12px;font-weight:600;background:var(--soft,var(--surface-2));color:var(--fg,var(--ink));white-space:nowrap}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--fg,var(--ink))}
+.p-Critical{--soft:var(--crit-soft);--fg:var(--crit)} .p-High{--soft:var(--high-soft);--fg:var(--high)} .p-Medium{--soft:var(--med-soft);--fg:var(--med)} .p-Low{--soft:var(--low-soft);--fg:var(--low)}
+.s-new{--fg:var(--ink-2)} .s-review{--fg:var(--ink-2)} .s-assigned{--fg:var(--accent)} .s-progress{--fg:var(--accent)} .s-resolved{--fg:var(--low)} .s-duplicate{--fg:var(--ink-3)}
+.tag{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border:1px solid var(--line);border-radius:4px;padding:1px 6px;color:var(--ink-3);vertical-align:middle}
+.dupbadge{font-size:11px;font-weight:600;color:var(--high);background:var(--high-soft);border-radius:4px;padding:1px 6px;white-space:nowrap}
+
+/* live analysis */
+.preview{position:sticky;top:calc(env(safe-area-inset-top,0px) + 72px);display:grid;gap:14px}
+.preview h2{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.kv{display:grid;gap:4px}
+.kv>.k{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);font-weight:600}
+.reasons{margin:0;padding:0;list-style:none;display:grid;gap:6px}
+.reasons li{display:flex;gap:10px;font-size:14px;align-items:baseline}
+.reasons .pts{font-family:var(--f-mono);font-size:12px;color:var(--ink-3);min-width:24px}
+.empty{color:var(--ink-3);font-size:14px;border:1px dashed var(--line);border-radius:8px;padding:16px}
+.dupcard{display:grid;gap:4px;border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface-2)}
+.dupcard .top2{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.match{font-family:var(--f-mono);font-size:12px;font-weight:500;color:var(--high)}
+
+/* success */
+.success{display:grid;gap:18px;max-width:760px}
+.idbox{display:flex;flex-wrap:wrap;align-items:center;gap:12px;border:2px solid var(--ink);border-radius:8px;padding:14px 18px;width:fit-content;max-width:100%}
+.idbox .mono{font-size:clamp(24px,5vw,34px);font-weight:500;letter-spacing:.02em}
+
+/* map */
+.mapbox{overflow-x:auto;border:1px solid var(--line);border-radius:8px;background:var(--map-land)}
+.mapbox svg{display:block;width:100%;min-width:520px;height:auto}
+.map-label{font-family:var(--f-body);font-size:21px;font-weight:600;fill:var(--map-label);paint-order:stroke;stroke:var(--map-land);stroke-width:5px;stroke-linejoin:round}
+.map-note{font-family:var(--f-mono);font-size:15px;fill:var(--map-label);opacity:.8}
+.pin{cursor:pointer}
+.pin:focus-visible circle.pc{stroke:var(--accent);stroke-width:4}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 12px;font-size:13px;font-weight:600;cursor:pointer;color:var(--ink-2)}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+
+/* admin */
+.adm-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:12px;margin-bottom:18px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));background:var(--surface);border:1px solid var(--line);border-radius:10px;margin-bottom:20px;overflow:hidden}
+.kpi{padding:14px 16px;border-right:1px solid var(--line-2);border-bottom:1px solid var(--line-2);margin:0 -1px -1px 0;min-width:0}
+.kpi .n{font-family:var(--f-display);font-stretch:112%;font-weight:800;font-size:30px;line-height:1.05;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;color:var(--ink-3);font-weight:600;margin-top:2px}
+.kpi.alert .n{color:var(--crit)}
+.grid2{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);gap:20px;margin-bottom:20px;align-items:start}
+.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px;margin-bottom:20px}
+.stack{display:grid;gap:14px;min-width:0}
+.panel-h{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;margin-bottom:14px}
+.bars{display:grid;gap:9px}
+.bar-row{display:grid;grid-template-columns:minmax(90px,150px) minmax(0,1fr) 28px;gap:10px;align-items:center;font-size:13px}
+.bar-row .nm{color:var(--ink-2);overflow-wrap:anywhere}
+.track{height:12px;background:var(--surface-2);border-radius:0 4px 4px 0}
+.fill{height:100%;border-radius:0 4px 4px 0;background:var(--s1);min-width:2px}
+.bar-row .ct{text-align:right;font-variant-numeric:tabular-nums;font-weight:600}
+.stackbar{display:flex;gap:2px;height:20px}
+.stackbar i{display:block;min-width:6px;border-radius:3px}
+.legend{display:grid;gap:6px;margin-top:14px;font-size:13px}
+.legend div{display:flex;align-items:center;gap:8px}
+.legend i{width:12px;height:12px;border-radius:3px;flex:none}
+.legend b{margin-left:auto;font-variant-numeric:tabular-nums}
+.chart-wrap{position:relative}
+.chart-wrap svg{display:block;width:100%;height:auto;overflow:visible}
+.chart-wrap text{font-family:var(--f-body);font-size:11px;fill:var(--ink-3)}
+.tip{position:absolute;pointer-events:none;background:var(--ink);color:var(--surface);font-size:12px;padding:6px 10px;border-radius:6px;white-space:nowrap;transform:translate(-50%,-110%);z-index:5}
+.keyrow{display:flex;gap:14px;font-size:12px;color:var(--ink-2);flex-wrap:wrap;margin-bottom:6px}
+.keyrow i{display:inline-block;width:14px;height:3px;border-radius:2px;margin-right:6px;vertical-align:middle}
+.hot{display:grid;gap:10px}
+.hot-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 10px;align-items:center;font-size:13px}
+.hot-row .bar2{grid-column:1/-1;height:6px;background:var(--surface-2);border-radius:3px}
+.hot-row .bar2 i{display:block;height:100%;background:var(--heat);border-radius:3px}
+.filters{display:grid;grid-template-columns:minmax(160px,2fr) repeat(4,minmax(110px,1fr));gap:10px;margin-bottom:14px}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;min-width:860px;font-size:13px}
+th{text-align:left;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-3);padding:9px 12px;background:var(--surface-2);border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:10px 12px;border-bottom:1px solid var(--line-2);vertical-align:top}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:var(--surface-2)}
+td .t{font-weight:600;display:block;max-width:420px}
+td .sub{color:var(--ink-3);font-size:12px}
+details.data{margin-top:12px;font-size:13px}
+details.data summary{cursor:pointer;color:var(--accent);font-weight:600}
+details.data table{min-width:0;margin-top:8px}
+.login{max-width:420px;margin:40px auto;display:grid;gap:14px}
+
+/* tracking */
+.tracker{max-width:820px;display:grid;gap:18px}
+.step-list{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;list-style:none;margin:0;padding:0}
+.step-list li{border-top:4px solid var(--line);padding-top:8px;font-size:12px;color:var(--ink-3);font-weight:600}
+.step-list li.done{border-color:var(--accent);color:var(--ink)}
+.step-list li.now{border-color:var(--accent);color:var(--accent)}
+.timeline{list-style:none;margin:0;padding:0 0 0 14px;border-left:2px solid var(--line);display:grid;gap:14px}
+.timeline li{position:relative;padding-left:14px}
+.timeline li::before{content:"";position:absolute;left:-22px;top:6px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)}
+.timeline .when{font-size:12px;color:var(--ink-3)}
+.samples{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+
+/* modal */
+.overlay{position:fixed;inset:0;background:rgba(5,10,16,.62);z-index:40;display:grid;place-items:start center;overflow-y:auto;padding:max(16px,env(safe-area-inset-top,0px)) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:12px;width:min(820px,100%);padding:22px;display:grid;gap:16px;margin-block:auto;min-width:0}
+.modal-h{display:flex;justify-content:space-between;align-items:start;gap:12px}
+.modal-h .meta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+.box{border:1px solid var(--line);border-radius:8px;padding:14px;display:grid;gap:10px;min-width:0;background:var(--surface-2)}
+.photo-big{max-width:100%;border-radius:8px;border:1px solid var(--line)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:8px;font-size:14px;z-index:60;max-width:calc(100% - 32px)}
+footer{border-top:1px solid var(--line);padding-block:18px calc(24px + env(safe-area-inset-bottom,0px));color:var(--ink-3);font-size:12px;max-width:1200px;margin-inline:auto}
+
+@media (max-width:900px){
+  .split,.grid2,.cols{grid-template-columns:minmax(0,1fr)}
+  .grid3{grid-template-columns:minmax(0,1fr)}
+  .preview{position:static}
+  .filters{grid-template-columns:1fr 1fr}
+  .filters .q{grid-column:1/-1}
+}
+@media (max-width:520px){
+  .row2{grid-template-columns:1fr}
+  .tabs a{padding:8px 10px}
+  .panel{padding:16px}
+  .step-list{grid-template-columns:1fr;gap:0}
+  .step-list li{border-top:0;border-left:4px solid var(--line);padding:4px 0 4px 10px}
+  .step-list li.done,.step-list li.now{border-left-color:var(--accent)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<header class="top">
+  <div class="wrap bar">
+    <a class="brand" href="#report" aria-label="Complaints to Action, home">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="7" fill="#F5C400"/><path d="M8 21 L8 11 L16 11 M16 11 L16 21 M16 16 L24 16 M20 12 L24 16 L20 20" fill="none" stroke="#101A27" stroke-width="2.6" stroke-linecap="square" stroke-linejoin="miter"/></svg>
+      <div><b>Complaints to Action</b><span>Nagarpur Municipal Corporation (demo)</span></div>
+    </a>
+    <nav class="tabs" aria-label="Main">
+      <a href="#report" data-tab="report">Report</a>
+      <a href="#track" data-tab="track">Track</a>
+      <a href="#admin" data-tab="admin">Admin</a>
+    </nav>
+  </div>
+</header>
+<main id="app" class="wrap"></main>
+<div id="modal-root"></div>
+<div id="toast-root" role="status" aria-live="polite"></div>
+<footer>Demo project with fictional data. The analysis is rule-based keyword and signal scoring that runs in your browser; it does not call an external AI model. Complaints are saved in this browser only.</footer>
+
+<script>
+/* ENGINE:START */
+const DAY=86400000, HOUR=3600000;
+
+/* Fictional city of Nagarpur, 10 km x 8 km. x,y are kilometres from the top-left corner. */
+const AREAS=[
+  {k:'lakeview',n:'Lake View Colony',x:2.0,y:1.6},
+  {k:'market',n:'Market Road',x:5.0,y:3.8},
+  {k:'gandhi',n:'Gandhi Chowk',x:4.2,y:2.6},
+  {k:'railway',n:'Railway Colony',x:7.6,y:2.2},
+  {k:'temple',n:'Temple Street',x:3.0,y:4.4},
+  {k:'sector4',n:'Sector 4',x:8.3,y:5.0},
+  {k:'busstand',n:'Old Bus Stand',x:5.9,y:5.4},
+  {k:'greenpark',n:'Green Park',x:1.6,y:6.2},
+  {k:'hillview',n:'Hill View Layout',x:2.9,y:7.0},
+  {k:'industrial',n:'Industrial Estate',x:8.6,y:7.0},
+  {k:'canal',n:'Canal Road',x:6.4,y:1.0},
+  {k:'university',n:'University Gate',x:4.6,y:6.5}
+];
+
+const DEPTS={
+  'Roads & Infrastructure':['Er. R. Menon','Er. S. Pillai'],
+  'Water Board':['Er. K. Nair','Er. L. Fernandes'],
+  'Solid Waste Management':['Insp. A. Khan','Insp. P. Das'],
+  'Street Lighting & Power':['Er. V. Rao','Er. T. Singh'],
+  'Storm Water Drains':['Er. M. Iyer','Er. B. Sharma'],
+  'Public Safety & Enforcement':['Insp. D. Verma','Insp. N. Joshi'],
+  'Parks & Horticulture':['Off. C. George','Off. H. Patel'],
+  'Pollution Control':['Off. G. Reddy','Off. F. Ali'],
+  'General Helpdesk':['Off. J. Thomas','Off. I. Banerjee']
+};
+
+/* term|weight. A trailing $ means the term must be a whole word. Otherwise it matches the start of a word. */
+const CAT_SRC={
+  roads:{label:'Roads & Potholes',dept:'Roads & Infrastructure',base:0,t:['pothole|4','crater|3','road|1','asphalt|2','tar$|1','footpath|2','pavement|2','speed breaker|3','speed bump|3','divider|1','cracked|1','resurfac|3','sinkhole|4','caved|3','cave in|3','traffic signal|4','signal not|3','zebra crossing|2','uneven|1','bumpy|2','tyre|1','skid|2']},
+  water:{label:'Water Supply',dept:'Water Board',base:1,t:['water supply|4','no water|4','tap$|2','taps$|2','pipeline|3','pipe burst|4','burst|1','pipe|2','leak|2','low pressure|3','pressure|1','tanker|3','borewell|3','bore well|3','dirty water|3','muddy water|3','contaminated|3','smelly water|3','water meter|2','valve|2','drinking water|3','water tank|2','water|1','supply|1']},
+  sanitation:{label:'Garbage & Sanitation',dept:'Solid Waste Management',base:0,t:['garbage|4','trash|3','waste|2','litter|2','dustbin|3','bin$|1','bins$|1','dump|2','stink|3','stench|3','smell|2','foul|2','rubbish|3','sweep|2','not collected|3','uncollected|3','landfill|3','burning waste|3','dead animal|4','carcass|3','public toilet|4','toilet|2','rotting|3','heap|2','garbage truck|3','collect|1']},
+  lighting:{label:'Street Lights',dept:'Street Lighting & Power',base:0,t:['street light|5','streetlight|5','street lamp|5','lamp|2','lamp post|3','dark|2','bulb|2','light pole|3','flicker|2','no light|3','lights not|3','light not|3','pitch dark|3','unlit|3','dim|1']},
+  drainage:{label:'Drainage & Flooding',dept:'Storm Water Drains',base:1,t:['drain|3','drainage|4','sewage|4','sewer|4','overflow|3','waterlog|4','flood|4','clogged|3','blocked|1','manhole|3','stagnant|3','stagnation|3','rainwater|3','rain water|3','storm drain|4','gutter|3','nala|3','nallah|3','culvert|3','puddle|2','mosquito|2','sludge|2']},
+  electricity:{label:'Electricity',dept:'Street Lighting & Power',base:1,t:['power cut|5','power outage|5','electricity|4','electric|2','transformer|5','live wire|5','wire|2','cable|2','sparking|4','spark|3','short circuit|5','voltage|4','outage|3','electric pole|4','pole|1','hanging wire|5','fuse|2','tripping|2','no power|5','power|1']},
+  safety:{label:'Public Safety',dept:'Public Safety & Enforcement',base:1,t:['accident|3','unsafe|3','theft|4','robbery|4','harass|4','stray dog|4','stray|2','dogs$|1','dog$|1','crime|4','fight|2','drunk|3','illegal|2','encroach|4','fire|3','hazard|3','danger|3','collapse|4','cctv|3','snatch|4','molest|5','gambling|3','parking|3','abandoned vehicle|3','rash driving|4','speeding|3']},
+  parks:{label:'Parks & Trees',dept:'Parks & Horticulture',base:0,t:['park$|3','parks$|3','tree|3','branch|2','fallen tree|4','playground|4','garden|3','bench|2','lake|2','fountain|2','overgrown|3','grass|2','sapling|2','pruning|3']},
+  noise:{label:'Noise & Pollution',dept:'Pollution Control',base:0,t:['noise|5','loud|3','speaker|3','music|3','honk|3','pollution|4','smoke|3','dust|2','air quality|4','factory|2','generator|2','construction|2','drilling|3','dj$|3','firework|3','crackers|3','chemical|3','burning|2']},
+  other:{label:'Other / General',dept:'General Helpdesk',base:0,t:[]}
+};
+const CATS={};
+for(const k in CAT_SRC){
+  CATS[k]={key:k,label:CAT_SRC[k].label,dept:CAT_SRC[k].dept,base:CAT_SRC[k].base,
+    terms:CAT_SRC[k].t.map(s=>{const p=s.split('|');let term=p[0],exact=false;if(term.endsWith('$')){exact=true;term=term.slice(0,-1);}
+      return {term,exact,w:p[1]?+p[1]:(term.includes(' ')?2:1)};})};
+}
+const PRI=['Low','Medium','High','Critical'];
+const NUMW={one:1,two:2,three:3,four:4,five:5,six:6,seven:7,eight:8,nine:9,ten:10,couple:2,few:3};
+
+function hayOf(text){
+  let h=' '+String(text||'').toLowerCase().replace(/[^a-z0-9]+/g,' ').trim()+' ';
+  h=h.replace(/ (one|two|three|four|five|six|seven|eight|nine|ten) (day|week|month)/g,(m,w,u)=>' '+NUMW[w]+' '+u);
+  return h;
+}
+
+function classify(text){
+  const hay=hayOf(text); const scores=[];
+  for(const k in CATS){
+    if(k==='other')continue;
+    let s=0; const hits=[];
+    for(const t of CATS[k].terms){
+      const found=t.exact?hay.includes(' '+t.term+' '):hay.includes(' '+t.term);
+      if(found){s+=t.w;hits.push(t.term);}
+    }
+    scores.push({key:k,score:s,hits});
+  }
+  scores.sort((a,b)=>b.score-a.score);
+  const best=scores[0], second=scores[1];
+  if(best.score<2)return {key:'other',score:0,confidence:'Low',hits:[]};
+  const margin=(best.score-second.score)/best.score;
+  const confidence=(best.score>=6&&margin>=0.4)?'High':(best.score>=3&&margin>=0.2)?'Medium':'Low';
+  return {key:best.key,score:best.score,confidence,hits:best.hits};
+}
+
+const SIGNALS=[
+  {re:/\b(accident|injur|died|death|fire|spark|live wire|electrocut|collaps|open manhole|exposed wire|hanging wire|gas leak|crash|bleed|bitten|bite|dangerous|short circuit|snatch|might fall|may fall|about to fall|will fall)/,pts:4,why:'Possible danger to life or property',fact:'Possible danger to life or property.'},
+  {re:/\b(child|children|kid|school|student|elderly|senior citizen|old age|old people|pregnant|patient|hospital|disabled|handicap|wheelchair|infant|baby|ambulance)/,pts:2,why:'Children, elderly people or patients are affected',fact:'Vulnerable people may be affected.'},
+  {re:/\b(sewage|sewer|contaminat|dirty water|disease|dengue|malaria|cholera|typhoid|diarrh|vomit|infection|mosquito|dead animal|stench|rotting|unhygien|breathing|sick)/,pts:2,why:'Possible health risk',fact:'Possible health risk.'},
+  {re:/\b(entire|whole (street|lane|colony|area)|all (the )?(houses|residents|families|flats)|residents|families|locality|neighbou?rhood|hundreds|dozens|everyone|many (people|families|houses|vehicles)|main road|busy|junction|flyover)/,pts:2,why:'Affects many people or a busy place',fact:'Likely affects many people.'},
+  {re:/\b(urgent|immediately|emergency|asap|serious|severe|critical|worst|unbearable)/,pts:1,why:'Citizen marked it as urgent',fact:null},
+  {re:/\b(again and again|repeated|third time|second time|many times|already complained|no action|no response|ignored|still not|nobody)/,pts:1,why:'Reported before without action',fact:'Previously reported without action.'},
+  {re:/\bblock(ed|ing)\b.{0,25}\b(road|traffic|entrance|gate|footpath|route)|traffic jam/,pts:1,why:'Blocking traffic or access',fact:'Blocking traffic or access.'}
+];
+
+function durationDays(hay){
+  let m=/(\d+) (day|week|month)/.exec(hay);
+  if(m)return +m[1]*(m[2]==='day'?1:m[2]==='week'?7:30);
+  if(/ since (last )?week | a week | last week /.test(hay))return 7;
+  if(/ since (last )?month | a month /.test(hay))return 30;
+  if(/ (for|since) (many|several) days /.test(hay))return 4;
+  return 0;
+}
+
+function makeTitle(text){
+  const s=String(text).replace(/\s+/g,' ').trim();
+  const parts=s.split(/(?<=[.!?])\s+/);
+  let first=parts[0];
+  if(first.length<30&&parts.length>1)first=parts.slice(0,2).join(' ');
+  first=first.replace(/[.!?]+$/,'');
+  if(first.length>84){first=first.slice(0,84);first=first.slice(0,first.lastIndexOf(' '))+'…';}
+  return first.charAt(0).toUpperCase()+first.slice(1);
+}
+
+function analyze(text,areaName,forcedCat){
+  const c=classify(text);
+  const key=(forcedCat&&forcedCat!=='auto')?forcedCat:c.key;
+  const cat=CATS[key]; const hay=hayOf(text);
+  const reasons=[]; let score=0;
+  if(cat.base>0){reasons.push({text:'Baseline for '+cat.label.toLowerCase(),pts:cat.base});score+=cat.base;}
+  const facts=[];
+  for(const s of SIGNALS){
+    if(s.re.test(hay)){reasons.push({text:s.why,pts:s.pts});score+=s.pts;if(s.fact)facts.push(s.fact);}
+  }
+  const days=durationDays(hay);
+  if(days>=7){reasons.push({text:'Unresolved for about '+days+' days',pts:2});score+=2;facts.unshift('Reported as ongoing for about '+days+' days.');}
+  else if(days>=3){reasons.push({text:'Ongoing for about '+days+' days',pts:1});score+=1;facts.unshift('Reported as ongoing for about '+days+' days.');}
+  const priority=score>=6?'Critical':score>=4?'High':score>=2?'Medium':'Low';
+  const summary=cat.label+' issue'+(areaName?' near '+areaName:'')+'. '+(facts.length?facts.join(' '):'No urgent signals found in the description.');
+  return {category:key,catLabel:cat.label,confidence:c.confidence,detected:c.key,detectedLabel:CATS[c.key].label,matched:c.hits,
+          score,priority,reasons,summary,title:makeTitle(text),dept:cat.dept};
+}
+
+/* Duplicate detection: shared words, same category, and distance on the map. */
+const STOP=new Set('a an the and or but of to in on at for with from by is are was were be been being it its this that these those i we you they he she my our your their me us them there here very so as if then than too just not no have has had do does did can could will would should may might also into onto over under near about around since still again please kindly sir madam complaint problem issue request since last day days week weeks every all any one two get got since like'.split(' '));
+function stem(w){
+  if(w.length>5&&w.endsWith('ing'))return w.slice(0,-3);
+  if(w.length>4&&w.endsWith('ed'))return w.slice(0,-2);
+  if(w.length>4&&w.endsWith('ies'))return w.slice(0,-3)+'y';
+  if(w.length>3&&w.endsWith('s')&&!w.endsWith('ss')&&!w.endsWith('us'))return w.slice(0,-1);
+  return w;
+}
+function stemMap(text){
+  const m=new Map();
+  for(const w of String(text).toLowerCase().replace(/[^a-z0-9]+/g,' ').split(' ')){
+    if(w.length<3||STOP.has(w))continue;
+    const s=stem(w); if(!m.has(s))m.set(s,w);
+  }
+  return m;
+}
+function findDuplicates(cand,list,excludeId){
+  const A=stemMap(cand.text); const out=[];
+  for(const c of list){
+    if(c.id===excludeId||c.status==='resolved'||c.status==='duplicate')continue;
+    const B=stemMap(c.text); let shared=[];
+    for(const [s,w] of A){if(B.has(s))shared.push(w);}
+    const sim=A.size&&B.size?shared.length/Math.sqrt(A.size*B.size):0;
+    const d=Math.hypot(cand.x-c.x,cand.y-c.y);
+    const prox=d<=0.3?1:d>=1.5?0:1-(d-0.3)/1.2;
+    const same=cand.category===c.category?1:0;
+    const score=0.5*sim+0.3*prox+0.2*same;
+    if(score>=0.55&&prox>0&&sim>=0.2)out.push({id:c.id,score,sim,distKm:d,same:!!same,shared:shared.slice(0,6)});
+  }
+  out.sort((a,b)=>b.score-a.score);
+  return out.slice(0,3);
+}
+
+/* Fictional sample complaints: [areaKey, text, daysAgo, status, extra] */
+const SEEDS=[
+ ['market',"Huge pothole in the middle of the busy Market Road near the vegetable shops. Two bikes have already skidded here and one rider was injured. Please fix urgently.",2,'new'],
+ ['market',"Deep pothole opposite the pharmacy on Market Road, water collects in it and two wheelers are falling. It has been like this for 10 days.",6,'review'],
+ ['market',"Garbage has not been collected on Market Road for 4 days. The heap is blocking half the footpath and there is a terrible smell.",3,'assigned'],
+ ['market',"Street light near the Market Road bus shelter is not working since last week. Very dark at night and women feel unsafe walking here.",5,'progress'],
+ ['market',"Tar road near Market Road signal has cracked and is uneven, causing a traffic jam every evening.",9,'resolved'],
+ ['lakeview',"Sewage is overflowing from the manhole on 3rd cross and flowing into the street. Children are walking through it to reach school. Dengue risk. Many residents affected.",1,'new'],
+ ['lakeview',"Drain overflow near Lake View park gate, dirty water standing for 6 days, mosquitoes everywhere.",4,'review'],
+ ['lakeview',"No water supply in our lane since 3 days. All houses are depending on tankers. Elderly people are struggling.",3,'assigned'],
+ ['lakeview',"Water supply pipe is leaking near the Lake View Colony entrance, a lot of water is being wasted since morning.",2,'progress'],
+ ['lakeview',"Garbage dumped near the lake fence by outsiders at night. A dead animal is also lying there with a foul smell.",7,'progress'],
+ ['lakeview',"Fallen tree branch is blocking the park footpath after yesterday's storm. Please remove it.",2,'new'],
+ ['gandhi',"Open manhole without cover at Gandhi Chowk crossing. Very dangerous for vehicles and pedestrians, especially at night.",1,'new'],
+ ['gandhi',"Traffic signal at Gandhi Chowk is not working since two days and there are near-accidents every hour.",2,'assigned'],
+ ['gandhi',"Street lights on the Gandhi Chowk flyover side are flickering and two lamps are off.",8,'review'],
+ ['gandhi',"Stray dogs are chasing school children and two wheelers near Gandhi Chowk every morning. A child was bitten last week.",4,'assigned'],
+ ['gandhi',"Garbage bin overflowing at Gandhi Chowk corner, waste spreading on the road.",10,'resolved'],
+ ['gandhi',"Footpath tiles broken near Gandhi Chowk bus stop, elderly people trip often.",11,'resolved'],
+ ['railway',"Transformer near Railway Colony is sparking and making loud noises, wires are hanging low. Please send electricity staff immediately.",1,'review'],
+ ['railway',"Power cut every night for 2 to 3 hours in Railway Colony for the last 10 days. Students are unable to study.",5,'progress'],
+ ['railway',"Loud DJ speakers playing music till 1 AM near the railway quarters ground. Noise is unbearable for patients and children.",3,'new'],
+ ['railway',"Water tank overflow wasting drinking water near Railway Colony block C, the tap is not closing.",12,'resolved'],
+ ['temple',"Garbage is thrown near Temple Street and the smell is spreading. The bin has not been cleaned for a week.",6,'review'],
+ ['temple',"Temple Street road was dug for pipeline work and not repaired. Big potholes and loose gravel are causing accidents.",8,'progress'],
+ ['temple',"Street light pole is tilted and might fall on the road near Temple Street entrance.",4,'assigned'],
+ ['temple',"Drain near Temple Street is blocked with plastic and water enters shops during rain.",9,'resolved'],
+ ['sector4',"Low water pressure in Sector 4 since a week. Upper floor flats get no water at all.",7,'review'],
+ ['sector4',"Sewage smell and blocked sewer line outside the Sector 4 community hall. Residents are falling sick.",2,'new'],
+ ['sector4',"Construction site generator and drilling noise from 6 AM, violating timings.",5,'review'],
+ ['sector4',"Park benches broken and grass overgrown in the Sector 4 children's park.",13,'resolved'],
+ ['busstand',"Old Bus Stand toilet is locked and extremely dirty. Travellers and elderly people cannot use it.",4,'new'],
+ ['busstand',"Encroachment by hawkers on the footpath at Old Bus Stand, pedestrians are forced to walk on the road. Busy junction.",6,'assigned'],
+ ['busstand',"Garbage truck did not come for 5 days in the Old Bus Stand area.",2,'new'],
+ ['busstand',"Huge crater on the busy road near the Old Bus Stand exit, buses are slowing and a car tyre burst yesterday.",3,'progress'],
+ ['greenpark',"Street lights not working in Green Park lane 2. Very dark, a chain snatching incident happened last month.",5,'assigned'],
+ ['greenpark',"Trees are overgrown and touching electric wires in Green Park. Sparks seen during wind.",3,'review'],
+ ['greenpark',"Drainage water entering houses in Green Park every time it rains. Waterlogging for 2 days after each rain.",10,'resolved'],
+ ['hillview',"Water tanker has not arrived in Hill View Layout for 5 days. Please arrange supply.",4,'new'],
+ ['hillview',"Road to Hill View Layout is full of potholes and gets slippery after rain. An ambulance had difficulty reaching.",6,'review'],
+ ['industrial',"Black smoke and chemical smell from a factory in Industrial Estate every night. Residents have breathing problems.",2,'new'],
+ ['industrial',"Streetlights are off on the Industrial Estate main road, trucks and workers are at risk at night.",8,'review'],
+ ['canal',"Canal Road drain is filled with garbage and the water is stagnant, big mosquito problem.",6,'progress'],
+ ['canal',"Footpath along Canal Road is broken, cyclists and walkers have to use the main road.",11,'resolved'],
+ ['university',"Illegal parking in front of University Gate is blocking the road. Ambulance route is not clear.",3,'new'],
+ ['busstand',"There is a very big crater on the Old Bus Stand exit road. Vehicles are getting damaged, please repair it.",2,'duplicate',{dupOf:'NMC-1033'}],
+ ['gandhi',"Manhole cover is missing at the Gandhi Chowk crossing. Someone will get hurt, very dangerous.",1,'duplicate',{dupOf:'NMC-1012'}]
+];
+
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+const ORDER=['new','review','assigned','progress','resolved'];
+const STATUS_LABEL={new:'Received',review:'Under review',assigned:'Assigned',progress:'In progress',resolved:'Resolved',duplicate:'Merged (duplicate)'};
+const STEP_NOTE={review:'Complaint reviewed by the helpdesk.',assigned:'Assigned to an officer.',progress:'Work has started.',resolved:'Issue resolved and verified.'};
+
+function buildSeeds(){
+  const rnd=mulberry32(11); const now=Date.now(); const out=[];
+  SEEDS.forEach((s,i)=>{
+    const [ak,text,days,status,extra]=s; const a=AREAS.find(x=>x.k===ak);
+    const an=analyze(text,a.n);
+    const created=now-days*DAY-Math.floor(rnd()*9)*HOUR-HOUR;
+    const x=Math.max(0.3,Math.min(9.7,a.x+(rnd()-0.5)*0.6)), y=Math.max(0.3,Math.min(7.7,a.y+(rnd()-0.5)*0.6));
+    const id='NMC-'+(1001+i);
+    const history=[{t:created,status:'new',note:'Complaint received.',by:'System'}];
+    let dept='',officer='';
+    if(status==='duplicate'){
+      history.push({t:created+HOUR*2,status:'duplicate',note:'Merged with '+extra.dupOf+' because it reports the same issue.',by:'Helpdesk'});
+    }else{
+      const idx=ORDER.indexOf(status);
+      if(idx>=2){dept=an.dept;officer=DEPTS[dept][i%2];}
+      for(let k=1;k<=idx;k++){
+        const frac=status==='resolved'?0.85*(k/idx):k/(idx+1);
+        let note=STEP_NOTE[ORDER[k]];
+        if(ORDER[k]==='assigned')note='Assigned to '+officer+', '+dept+'.';
+        history.push({t:Math.round(created+(now-created)*frac),status:ORDER[k],note,by:ORDER[k]==='review'?'Helpdesk':officer||'Helpdesk'});
+      }
+    }
+    out.push({id,text,title:an.title,category:an.category,catLabel:an.catLabel,confidence:an.confidence,matched:an.matched,
+      priority:an.priority,score:an.score,reasons:an.reasons,summary:an.summary,area:a.n,areaKey:a.k,x:+x.toFixed(2),y:+y.toFixed(2),
+      img:null,name:'',contact:'',status,dept,officer,createdAt:created,history,dupOf:extra?extra.dupOf:null,reports:1});
+  });
+  out.forEach(c=>{if(c.dupOf){const o=out.find(z=>z.id===c.dupOf);if(o)o.reports++;}});
+  return out;
+}
+/* ENGINE:END */
+
+/* ---------- APP ---------- */
+const KEY='nmc-complaints-v2';
+const state={view:'report',complaints:[],filters:{status:'all',priority:'all',cat:'all',q:'',sort:'priority'},adminOk:false,layer:'both',
+  pin:{x:AREAS[1].x,y:AREAS[1].y},img:null,success:null,trackResult:null,trackId:'',pending:null,warned:false,trend:null};
+
+const $=(s,r=document)=>r.querySelector(s);
+const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=ms=>new Date(ms).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'numeric',minute:'2-digit'});
+const ago=ms=>{const d=(Date.now()-ms)/DAY;if(d<1/24)return 'just now';if(d<1)return Math.floor(d*24)+' h ago';return Math.floor(d)+' d ago';};
+const open=c=>c.status!=='resolved'&&c.status!=='duplicate';
+const nearestArea=(x,y)=>AREAS.reduce((b,a)=>Math.hypot(a.x-x,a.y-y)<Math.hypot(b.x-x,b.y-y)?a:b);
+const get=id=>state.complaints.find(c=>c.id===id);
+
+function loadStore(){
+  try{const r=localStorage.getItem(KEY);if(r){const d=JSON.parse(r);if(Array.isArray(d)&&d.length)return d;}}catch(e){}
+  return null;
+}
+function saveStore(){
+  try{localStorage.setItem(KEY,JSON.stringify(state.complaints));}
+  catch(e){if(!state.warned){state.warned=true;toast('This browser cannot save data. Your changes will be lost on reload.');}}
+}
+function toast(msg){
+  const r=$('#toast-root');r.innerHTML='<div class="toast">'+esc(msg)+'</div>';
+  clearTimeout(toast.t);toast.t=setTimeout(()=>{r.innerHTML='';},3200);
+}
+function copyText(txt){
+  const done=()=>toast('Copied '+txt);
+  try{navigator.clipboard.writeText(txt).then(done,()=>toast('Copy this ID: '+txt));}catch(e){toast('Copy this ID: '+txt);}
+}
+
+/* ----- schematic city map ----- */
+function baseMap(){
+  return '<rect width="1000" height="800" fill="var(--map-land)"/>'+
+  '<ellipse cx="205" cy="165" rx="105" ry="58" fill="var(--map-water)"/>'+
+  '<path d="M0 575 C200 535 330 640 520 605 S800 650 1000 596" fill="none" stroke="var(--map-water)" stroke-width="26" stroke-linecap="round"/>'+
+  '<rect x="105" y="650" width="120" height="70" rx="10" fill="var(--map-park)"/>'+
+  '<rect x="775" y="440" width="90" height="60" rx="10" fill="var(--map-park)"/>'+
+  '<rect x="560" y="150" width="110" height="70" rx="10" fill="var(--map-park)"/>'+
+  '<ellipse cx="500" cy="400" rx="440" ry="340" fill="none" stroke="var(--map-road-edge)" stroke-width="16"/>'+
+  '<ellipse cx="500" cy="400" rx="440" ry="340" fill="none" stroke="var(--map-road)" stroke-width="10"/>'+
+  [['M0 260 L1000 260',12],['M0 380 L1000 380',12],['M420 0 L420 800',12],['M650 0 L650 800',9],['M380 100 L1000 100',9],['M0 700 L1000 700',9],['M200 0 L200 800',9]].map(r=>
+    '<path d="'+r[0]+'" stroke="var(--map-road-edge)" stroke-width="'+(r[1]+5)+'" fill="none"/><path d="'+r[0]+'" stroke="var(--map-road)" stroke-width="'+r[1]+'" fill="none"/>').join('')+
+  '<path d="M600 0 L760 220 L1000 330" fill="none" stroke="var(--map-rail)" stroke-width="5" stroke-dasharray="14 9"/>';
+}
+function areaLabels(counts){
+  return AREAS.map(a=>{
+    const n=counts?counts[a.k]||0:null;
+    return '<text class="map-label" x="'+(a.x*100)+'" y="'+(a.y*100+40)+'" text-anchor="middle">'+esc(a.n)+(n?' · '+n:'')+'</text>';
+  }).join('');
+}
+const PRI_COLOR={Critical:'var(--crit)',High:'var(--high)',Medium:'var(--med)',Low:'var(--low)'};
+
+/* ----- report view ----- */
+function areaOptions(sel){return AREAS.map(a=>'<option value="'+a.k+'"'+(a.k===sel?' selected':'')+'>'+esc(a.n)+'</option>').join('');}
+function catOptions(){return '<option value="auto">Not sure, detect it for me</option>'+Object.keys(CATS).filter(k=>k!=='other').map(k=>'<option value="'+k+'">'+esc(CATS[k].label)+'</option>').join('')+'<option value="other">Other / General</option>';}
+
+function reportView(){
+  if(state.success)return successView(state.success);
+  const a0=nearestArea(state.pin.x,state.pin.y);
+  return '<section>'+
+  '<div class="intro"><p class="kicker">Citizen helpdesk</p><h1>Tell us what is broken on your street.</h1>'+
+  '<p class="lede">Describe the problem and pin it on the map. Your report is analysed, given a priority with reasons, checked against similar complaints nearby and sent to the right department.</p></div>'+
+  '<div class="split">'+
+  '<form id="f" class="panel" novalidate>'+
+    '<div class="field"><label for="desc">What is the problem?</label><textarea id="desc" placeholder="Example: Big pothole near the school gate on Temple Street. Two scooters have slipped this week and children cross here every morning." required></textarea><span class="hint" id="count">Write at least 20 characters. Details such as how long it has been going on help set the priority.</span></div>'+
+    '<div class="row2"><div class="field"><label for="cat">Category</label><select id="cat">'+catOptions()+'</select></div>'+
+    '<div class="field"><label for="area">Area</label><select id="area">'+areaOptions(a0.k)+'</select></div></div>'+
+    '<div class="field"><span class="label">Pin the exact spot</span><div class="mapbox"><svg id="pickmap" viewBox="0 0 1000 800" role="img" aria-label="Schematic map of Nagarpur. Click to place a pin.">'+baseMap()+areaLabels(null)+
+      '<g id="pin" transform="translate('+state.pin.x*100+' '+state.pin.y*100+')"><circle r="30" fill="var(--accent)" opacity=".18"/><circle r="12" fill="var(--accent)" stroke="var(--surface)" stroke-width="4"/></g>'+
+      '<text class="map-note" x="16" y="784">Schematic map, not to scale</text></svg></div>'+
+      '<span class="hint" id="pinnote">Pinned near '+esc(a0.n)+'. Click the map to move the pin.</span></div>'+
+    '<div class="field"><span class="label">Photo (optional)</span><div class="photo-row"><input type="file" id="photo" accept="image/*"><span id="thumbwrap"></span></div></div>'+
+    '<div class="row2"><div class="field"><label for="name">Your name (optional)</label><input type="text" id="name" autocomplete="name"></div>'+
+    '<div class="field"><label for="contact">Phone or email (optional)</label><input type="text" id="contact" autocomplete="off"></div></div>'+
+    '<div class="btns"><button type="submit" class="btn primary">Submit complaint</button></div>'+
+    '<p class="fine" id="formerr" role="alert"></p>'+
+  '</form>'+
+  '<aside class="panel preview" id="preview" aria-live="polite"></aside>'+
+  '</div></section>';
+}
+
+function previewHTML(){
+  const text=($('#desc')||{}).value||'';
+  if(text.trim().length<12){
+    return '<h2>Live analysis <span class="tag">Rule-based</span></h2><p class="empty">Start typing your complaint. The category, priority, summary and any similar nearby complaints appear here as you write.</p>';
+  }
+  const area=AREAS.find(a=>a.k===$('#area').value)||AREAS[0];
+  const choice=$('#cat').value;
+  const an=analyze(text,area.n,choice);
+  const dups=findDuplicates({text,category:an.category,x:state.pin.x,y:state.pin.y},state.complaints);
+  let h='<h2>Live analysis <span class="tag">Rule-based</span></h2>';
+  h+='<div class="kv"><span class="k">Category</span><div><b>'+esc(an.catLabel)+'</b>'+(choice==='auto'?' <span class="muted small">(detected, '+an.confidence.toLowerCase()+' confidence)</span>':' <span class="muted small">(your choice)</span>')+'</div>'+
+     (choice!=='auto'&&an.detected!==an.category?'<span class="hint">The text looks more like “'+esc(an.detectedLabel)+'”. Your choice is used.</span>':'')+
+     (an.matched.length?'<span class="hint">Matched words: '+an.matched.slice(0,6).map(esc).join(', ')+'</span>':'')+'</div>';
+  h+='<div class="kv"><span class="k">Priority</span><div><span class="pill p-'+an.priority+'">'+an.priority+'</span> <span class="mono small muted">score '+an.score+'</span></div>';
+  h+=an.reasons.length?'<ul class="reasons">'+an.reasons.map(r=>'<li><span class="pts">+'+r.pts+'</span><span>'+esc(r.text)+'</span></li>').join('')+'</ul>':'<span class="hint">No urgency signals found yet. Mention danger, how long it has lasted, or who is affected.</span>';
+  h+='<span class="hint">Critical 6+, High 4+, Medium 2+, Low below 2.</span></div>';
+  h+='<div class="kv"><span class="k">Summary</span><p>'+esc(an.summary)+'</p></div>';
+  h+='<div class="kv"><span class="k">Similar open complaints nearby</span>'+(dups.length?dups.map(dupCard).join(''):'<span class="hint">None found. This looks like a new issue.</span>')+'</div>';
+  h+='<p class="fine">How this works: the engine scores keywords for each category, adds points for urgency signals, and compares wording and map distance with open complaints. It is not a language model.</p>';
+  return h;
+}
+function dupCard(d){
+  const c=get(d.id);if(!c)return '';
+  return '<div class="dupcard"><div class="top2"><span><span class="mono">'+esc(c.id)+'</span> <span class="pill s-'+c.status+'">'+STATUS_LABEL[c.status]+'</span></span><span class="match">'+Math.round(d.score*100)+'% match</span></div>'+
+    '<span class="small">'+esc(c.title)+'</span><span class="fine">'+esc(c.area)+' · '+(d.distKm*1000).toFixed(0)+' m away'+(d.same?' · same category':'')+(d.shared.length?' · shared words: '+d.shared.map(esc).join(', '):'')+'</span></div>';
+}
+function updatePreview(){const p=$('#preview');if(p)p.innerHTML=previewHTML();}
+
+function readImage(file){
+  return new Promise((res,rej)=>{
+    const fr=new FileReader();
+    fr.onerror=()=>rej(new Error('read'));
+    fr.onload=()=>{
+      const im=new Image();
+      im.onerror=()=>rej(new Error('img'));
+      im.onload=()=>{
+        const max=640,sc=Math.min(1,max/Math.max(im.width,im.height));
+        const cv=document.createElement('canvas');cv.width=Math.round(im.width*sc);cv.height=Math.round(im.height*sc);
+        cv.getContext('2d').drawImage(im,0,0,cv.width,cv.height);
+        res(cv.toDataURL('image/jpeg',0.75));
+      };
+      im.src=fr.result;
+    };
+    fr.readAsDataURL(file);
+  });
+}
+
+function nextId(){return 'NMC-'+(Math.max(1000,...state.complaints.map(c=>+c.id.replace(/\D/g,'')))+1);}
+
+function readForm(){
+  const text=$('#desc').value.trim();
+  const area=nearestArea(state.pin.x,state.pin.y);
+  const an=analyze(text,area.n,$('#cat').value);
+  return {text,area,an,name:$('#name').value.trim(),contact:$('#contact').value.trim()};
+}
+function submitForm(){
+  const err=$('#formerr');err.textContent='';
+  const text=$('#desc').value.trim();
+  if(text.length<20){err.textContent='Please describe the problem in at least 20 characters.';$('#desc').focus();return;}
+  const f=readForm();
+  const dups=findDuplicates({text:f.text,category:f.an.category,x:state.pin.x,y:state.pin.y},state.complaints);
+  if(dups.length){state.pending=f;showDupModal(dups[0]);return;}
+  createComplaint(f,null);
+}
+function createComplaint(f,dupOf){
+  const now=Date.now();
+  const c={id:nextId(),text:f.text,title:f.an.title,category:f.an.category,catLabel:f.an.catLabel,confidence:f.an.confidence,matched:f.an.matched,
+    priority:f.an.priority,score:f.an.score,reasons:f.an.reasons,summary:f.an.summary,area:f.area.n,areaKey:f.area.k,x:+state.pin.x.toFixed(2),y:+state.pin.y.toFixed(2),
+    img:state.img,name:f.name,contact:f.contact,status:dupOf?'duplicate':'new',dept:'',officer:'',createdAt:now,
+    history:[{t:now,status:'new',note:'Complaint received.',by:'System'}],dupOf:dupOf||null,reports:1};
+  if(dupOf){
+    c.history.push({t:now+1000,status:'duplicate',note:'Merged with '+dupOf+' because it reports the same issue. You will see updates on '+dupOf+'.',by:'System'});
+    const o=get(dupOf);if(o)o.reports=(o.reports||1)+1;
+  }
+  state.complaints.unshift(c);saveStore();
+  state.success=c;state.img=null;state.pending=null;closeModal();render();window.scrollTo(0,0);
+}
+function successView(c){
+  const merged=c.dupOf;
+  return '<section class="success"><p class="kicker">Complaint received</p><h1>'+(merged?'Added to an existing complaint.':'Thank you. Your complaint is registered.')+'</h1>'+
+  '<p class="lede">Keep this ID. You can use it on the Track page to see every update.</p>'+
+  '<div class="idbox"><span class="mono">'+esc(c.id)+'</span><button class="btn small" data-act="copy" data-id="'+esc(c.id)+'">Copy ID</button></div>'+
+  (merged?'<p>Our check found the same issue already reported as <span class="mono">'+esc(merged)+'</span>. Your report is linked to it and counted as another citizen affected.</p>':'')+
+  '<div class="panel stack"><div class="kv"><span class="k">What the analysis found</span><div><b>'+esc(c.catLabel)+'</b> · <span class="pill p-'+c.priority+'">'+c.priority+' priority</span></div></div>'+
+  '<ul class="reasons">'+c.reasons.map(r=>'<li><span class="pts">+'+r.pts+'</span><span>'+esc(r.text)+'</span></li>').join('')+'</ul><p>'+esc(c.summary)+'</p></div>'+
+  '<div class="btns"><button class="btn primary" data-act="track-this" data-id="'+esc(c.id)+'">Track this complaint</button><button class="btn" data-act="again">Report another problem</button></div></section>';
+}
+function showDupModal(d){
+  openModal('<div class="modal" role="dialog" aria-modal="true" aria-labelledby="dtitle"><div class="stack"><h2 id="dtitle">This looks like an issue that is already reported</h2>'+
+   '<p class="muted">We found a similar open complaint close to your pin. Adding your report to it helps officers see how many people are affected and avoids double work.</p>'+dupCard(d)+
+   '<div class="btns"><button class="btn primary" data-act="merge" data-id="'+esc(d.id)+'">Same issue: add my report</button><button class="btn" data-act="submitnew">Different issue: submit as new</button><button class="btn" data-act="closemodal">Go back and edit</button></div></div></div>');
+}
+
+/* ----- track view ----- */
+function normId(v){const n=String(v).replace(/\D/g,'');return n?'NMC-'+n:'';}
+function trackView(){
+  const samples=[state.complaints.find(c=>c.status==='resolved'),state.complaints.find(c=>c.status==='progress'),state.complaints.find(c=>c.status==='new')].filter(Boolean);
+  return '<section class="tracker"><div class="intro"><p class="kicker">Complaint tracking</p><h1>Where is my complaint?</h1><p class="lede">Enter the complaint ID you received when you submitted it.</p></div>'+
+  '<form id="tf" class="panel" novalidate><div class="field"><label for="tid">Complaint ID</label><div class="btns"><input type="text" id="tid" value="'+esc(state.trackId)+'" placeholder="NMC-1042" style="max-width:260px" autocomplete="off"><button class="btn primary" type="submit">Track</button></div></div>'+
+  (samples.length?'<div class="samples"><span class="fine">Try a sample:</span>'+samples.map(s=>'<button type="button" class="link" data-act="sample" data-id="'+esc(s.id)+'">'+esc(s.id)+'</button>').join('')+'</div>':'')+'</form>'+
+  '<div id="trackout">'+trackResultHTML()+'</div></section>';
+}
+function trackResultHTML(){
+  const r=state.trackResult;if(!r)return '';
+  if(r==='none')return '<div class="panel"><b>No complaint found with that ID.</b><p class="muted">Check the ID and try again. It looks like NMC-1042.</p></div>';
+  const c=get(r);if(!c)return '';
+  const idx=ORDER.indexOf(c.status);
+  const steps=c.status==='duplicate'?'':'<ol class="step-list">'+ORDER.map((s,i)=>'<li class="'+(i<idx||c.status==='resolved'?'done':i===idx?'now':'')+'">'+STATUS_LABEL[s]+'</li>').join('')+'</ol>';
+  return '<div class="panel stack"><div class="modal-h"><div><span class="mono muted">'+esc(c.id)+'</span><h2>'+esc(c.title)+'</h2></div><div class="meta"><span class="pill s-'+c.status+'">'+STATUS_LABEL[c.status]+'</span></div></div>'+
+    steps+
+    (c.status==='duplicate'?'<p>This report was merged with <button class="link" data-act="sample" data-id="'+esc(c.dupOf)+'">'+esc(c.dupOf)+'</button>, which covers the same issue.</p>':'')+
+    '<div class="cols"><div class="kv"><span class="k">Category</span><span>'+esc(c.catLabel)+'</span></div><div class="kv"><span class="k">Location</span><span>'+esc(c.area)+'</span></div>'+
+    '<div class="kv"><span class="k">Priority</span><span><span class="pill p-'+c.priority+'">'+c.priority+'</span></span></div><div class="kv"><span class="k">Handled by</span><span>'+(c.officer?esc(c.officer)+', '+esc(c.dept):'Not assigned yet')+'</span></div></div>'+
+    '<div class="kv"><span class="k">Updates</span><ul class="timeline">'+c.history.slice().reverse().map(h=>'<li><b>'+STATUS_LABEL[h.status]+'</b><div>'+esc(h.note)+'</div><div class="when">'+fmt(h.t)+'</div></li>').join('')+'</ul></div></div>';
+}
+function doTrack(v){
+  state.trackId=v;const id=normId(v);
+  state.trackResult=id&&get(id)?id:'none';
+  const o=$('#trackout');if(o)o.innerHTML=trackResultHTML();
+}
+
+/* ----- admin ----- */
+const rank=p=>PRI.indexOf(p);
+function stats(){
+  const L=state.complaints,op=L.filter(open);
+  const res=L.filter(c=>c.status==='resolved');
+  const times=res.map(c=>{const h=c.history.find(x=>x.status==='resolved');return h?h.t-c.createdAt:null;}).filter(Boolean);
+  const byCat={},byArea={},byStatus={};
+  L.forEach(c=>{byCat[c.catLabel]=(byCat[c.catLabel]||0)+1;byStatus[c.status]=(byStatus[c.status]||0)+1;});
+  op.forEach(c=>{byArea[c.areaKey]=(byArea[c.areaKey]||0)+1;});
+  const byPri={Critical:0,High:0,Medium:0,Low:0};op.forEach(c=>byPri[c.priority]++);
+  return {total:L.length,open:op.length,urgent:byPri.Critical+byPri.High,resolved:res.length,rate:L.length?Math.round(res.length/L.length*100):0,
+    avgDays:times.length?(times.reduce((a,b)=>a+b,0)/times.length/DAY):0,merged:byStatus.duplicate||0,byCat,byArea,byStatus,byPri};
+}
+function dupMap(){
+  const m={};
+  state.complaints.filter(open).forEach(c=>{const d=findDuplicates(c,state.complaints,c.id);if(d.length)m[c.id]=d[0];});
+  return m;
+}
+function adminView(){
+  if(!state.adminOk)return '<section class="login panel"><p class="kicker">Staff only</p><h1 style="font-size:28px">Admin sign in</h1><p class="muted">Demo PIN: <span class="mono">1234</span>. This check runs in the browser and is not real security.</p>'+
+    '<form id="lf" novalidate class="stack"><div class="field"><label for="pin">PIN</label><input type="text" id="pin" inputmode="numeric" autocomplete="off" style="max-width:200px"></div><div class="btns"><button class="btn primary" type="submit">Open dashboard</button></div><p class="fine" id="lerr" role="alert"></p></form></section>';
+  const s=stats();
+  return '<section><div class="adm-head"><div><p class="kicker">Admin dashboard</p><h1>Complaint control room</h1></div><div class="btns"><button class="btn small" data-act="reset">Reset sample data</button><button class="btn small" data-act="logout">Sign out</button></div></div>'+
+  '<div class="kpis">'+
+   kpi(s.total,'Complaints received')+kpi(s.open,'Open')+'<div class="kpi alert"><div class="n">'+s.urgent+'</div><div class="l">Critical or High, open</div></div>'+
+   kpi(s.rate+'%','Resolved')+kpi(s.avgDays?s.avgDays.toFixed(1)+' d':'n/a','Average days to resolve')+kpi(s.merged,'Duplicates merged')+'</div>'+
+  '<div class="grid2"><div class="panel"><div class="panel-h"><div><h2>Hotspot map</h2><p class="fine">Open complaints. Darker red where reports overlap. Pin colour shows priority.</p></div>'+
+   '<div class="seg" role="group" aria-label="Map layers">'+['heat','pins','both'].map(l=>'<button data-act="layer" data-l="'+l+'" aria-pressed="'+(state.layer===l)+'">'+({heat:'Heat',pins:'Pins',both:'Both'})[l]+'</button>').join('')+'</div></div>'+mapHTML(s)+
+   '<div class="keyrow" style="margin-top:10px">'+PRI.slice().reverse().map(p=>'<span><i style="background:'+PRI_COLOR[p]+';height:10px;width:10px;border-radius:50%"></i>'+p+'</span>').join('')+'</div></div>'+
+   '<div class="stack"><div class="panel"><div class="panel-h"><h2>Top hotspots</h2></div>'+hotHTML(s)+'</div><div class="panel"><div class="panel-h"><h2>Open by priority</h2></div>'+priHTML(s)+'</div></div></div>'+
+  '<div class="grid3"><div class="panel"><div class="panel-h"><h2>By category</h2></div>'+catHTML(s)+'</div>'+
+   '<div class="panel"><div class="panel-h"><h2>Status mix</h2></div>'+statusHTML(s)+'</div>'+
+   '<div class="panel"><div class="panel-h"><h2>Last 14 days</h2></div>'+trendHTML()+'</div></div>'+
+  '<div class="panel"><div class="panel-h"><h2>Complaint queue</h2><span class="fine" id="qcount"></span></div>'+filtersHTML()+'<div class="tbl" id="queue"></div></div></section>';
+}
+function kpi(n,l){return '<div class="kpi"><div class="n">'+n+'</div><div class="l">'+l+'</div></div>';}
+function mapHTML(s){
+  const op=state.complaints.filter(open);
+  const heat=(state.layer!=='pins')?op.map(c=>'<circle cx="'+c.x*100+'" cy="'+c.y*100+'" r="78" fill="var(--heat)" opacity=".13"/>').join(''):'';
+  const pins=(state.layer!=='heat')?op.map(c=>'<g class="pin" data-act="open" data-id="'+c.id+'" tabindex="0" role="button" aria-label="'+esc(c.id+', '+c.priority+', '+c.title)+'"><title>'+esc(c.id+' · '+c.priority+' · '+c.title)+'</title><circle r="24" cx="'+c.x*100+'" cy="'+c.y*100+'" fill="transparent"/><circle class="pc" r="12" cx="'+c.x*100+'" cy="'+c.y*100+'" fill="'+PRI_COLOR[c.priority]+'" stroke="var(--surface)" stroke-width="3.5"/></g>').join(''):'';
+  return '<div class="mapbox"><svg viewBox="0 0 1000 800" role="group" aria-label="Map of open complaints">'+baseMap()+heat+areaLabels(s.byArea)+pins+'<text class="map-note" x="16" y="784">Schematic map of fictional Nagarpur, not to scale</text></svg></div>';
+}
+function hotHTML(s){
+  const rows=AREAS.map(a=>({a,n:s.byArea[a.k]||0,max:state.complaints.filter(c=>open(c)&&c.areaKey===a.k).reduce((m,c)=>Math.max(m,rank(c.priority)),-1)})).filter(r=>r.n).sort((x,y)=>y.n-x.n||y.max-x.max).slice(0,6);
+  const mx=rows.length?rows[0].n:1;
+  return '<div class="hot">'+rows.map(r=>'<div class="hot-row"><span>'+esc(r.a.n)+'</span><span><b>'+r.n+'</b> <span class="pill p-'+PRI[r.max]+'">'+PRI[r.max]+'</span></span><div class="bar2"><i style="width:'+Math.round(r.n/mx*100)+'%"></i></div></div>').join('')+'</div>';
+}
+function priHTML(s){
+  const mx=Math.max(1,...Object.values(s.byPri));
+  return '<div class="bars">'+PRI.slice().reverse().map(p=>'<div class="bar-row" style="grid-template-columns:70px minmax(0,1fr) 28px"><span class="nm">'+p+'</span><div class="track"><div class="fill" style="width:'+Math.round(s.byPri[p]/mx*100)+'%;background:'+PRI_COLOR[p]+'"></div></div><span class="ct">'+s.byPri[p]+'</span></div>').join('')+'</div>';
+}
+function catHTML(s){
+  const rows=Object.entries(s.byCat).sort((a,b)=>b[1]-a[1]);const mx=rows[0]?rows[0][1]:1;
+  return '<div class="bars">'+rows.map(([n,v])=>'<div class="bar-row" title="'+esc(n)+': '+v+'"><span class="nm">'+esc(n)+'</span><div class="track"><div class="fill" style="width:'+Math.round(v/mx*100)+'%"></div></div><span class="ct">'+v+'</span></div>').join('')+'</div>'+
+    '<details class="data"><summary>View as table</summary><table><thead><tr><th>Category</th><th>Count</th></tr></thead><tbody>'+rows.map(([n,v])=>'<tr><td>'+esc(n)+'</td><td>'+v+'</td></tr>').join('')+'</tbody></table></details>';
+}
+function statusHTML(s){
+  const keys=['new','review','assigned','progress','resolved','duplicate'];
+  const col=['--st1','--st2','--st3','--st4','--st5','--st6'];
+  return '<div class="stackbar" role="img" aria-label="Status mix">'+keys.map((k,i)=>s.byStatus[k]?'<i style="flex:'+s.byStatus[k]+';background:var('+col[i]+')" title="'+STATUS_LABEL[k]+': '+s.byStatus[k]+'"></i>':'').join('')+'</div>'+
+    '<div class="legend">'+keys.map((k,i)=>'<div><i style="background:var('+col[i]+')"></i>'+STATUS_LABEL[k]+'<b>'+(s.byStatus[k]||0)+'</b></div>').join('')+'</div>';
+}
+function trendHTML(){
+  const days=[];const t0=new Date();t0.setHours(0,0,0,0);
+  for(let i=13;i>=0;i--)days.push({d:new Date(t0.getTime()-i*DAY),n:0,r:0});
+  const idx=ms=>{const d=new Date(ms);d.setHours(0,0,0,0);return Math.round((d-days[0].d)/DAY);};
+  state.complaints.forEach(c=>{const i=idx(c.createdAt);if(i>=0&&i<14)days[i].n++;const h=c.history.find(x=>x.status==='resolved');if(h){const j=idx(h.t);if(j>=0&&j<14)days[j].r++;}});
+  state.trend=days;
+  const W=420,H=230,L=28,R=64,T=12,B=26;const mx=Math.max(4,...days.map(d=>Math.max(d.n,d.r)));const top=Math.ceil(mx/2)*2;
+  const X=i=>L+(W-L-R)*i/13, Y=v=>T+(H-T-B)*(1-v/top);
+  const line=k=>days.map((d,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(d[k]).toFixed(1)).join(' ');
+  let g='';
+  for(let v=0;v<=top;v+=top/4){g+='<line x1="'+L+'" x2="'+(W-R)+'" y1="'+Y(v)+'" y2="'+Y(v)+'" stroke="var(--grid)" stroke-width="1"/><text x="'+(L-6)+'" y="'+(Y(v)+4)+'" text-anchor="end">'+Math.round(v)+'</text>';}
+  days.forEach((d,i)=>{if(i%3===0||i===13)g+='<text x="'+X(i)+'" y="'+(H-8)+'" text-anchor="middle">'+d.d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'</text>';});
+  const area=line('n')+' L'+X(13)+' '+Y(0)+' L'+X(0)+' '+Y(0)+' Z';
+  return '<div class="keyrow"><span><i style="background:var(--s1)"></i>New</span><span><i style="background:var(--s2)"></i>Resolved</span></div>'+
+   '<div class="chart-wrap" id="trendwrap"><svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Complaints received and resolved per day over the last 14 days">'+g+
+   '<path d="'+area+'" fill="var(--s1)" opacity=".12"/><path d="'+line('n')+'" fill="none" stroke="var(--s1)" stroke-width="2" stroke-linejoin="round"/><path d="'+line('r')+'" fill="none" stroke="var(--s2)" stroke-width="2" stroke-linejoin="round"/>'+
+   '<circle cx="'+X(13)+'" cy="'+Y(days[13].n)+'" r="4" fill="var(--s1)" stroke="var(--surface)" stroke-width="2"/><circle cx="'+X(13)+'" cy="'+Y(days[13].r)+'" r="4" fill="var(--s2)" stroke="var(--surface)" stroke-width="2"/>'+
+   '<text x="'+(X(13)+8)+'" y="'+(Y(days[13].n)-2)+'" style="fill:var(--ink-2)">New</text><text x="'+(X(13)+8)+'" y="'+(Y(days[13].r)+12)+'" style="fill:var(--ink-2)">Resolved</text>'+
+   '<line id="cross" x1="0" x2="0" y1="'+T+'" y2="'+(H-B)+'" stroke="var(--axis)" stroke-width="1" visibility="hidden"/>'+
+   '<rect class="trend-hit" x="'+L+'" y="'+T+'" width="'+(W-L-R)+'" height="'+(H-T-B)+'" fill="transparent" data-l="'+L+'" data-w="'+(W-L-R)+'" data-vw="'+W+'"/></svg><div class="tip" id="tip" hidden></div></div>'+
+   '<details class="data"><summary>View as table</summary><table><thead><tr><th>Day</th><th>New</th><th>Resolved</th></tr></thead><tbody>'+days.slice().reverse().map(d=>'<tr><td>'+d.d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+'</td><td>'+d.n+'</td><td>'+d.r+'</td></tr>').join('')+'</tbody></table></details>';
+}
+function trendMove(e){
+  const hit=e.target.closest('.trend-hit');if(!hit||!state.trend)return;
+  const svg=hit.ownerSVGElement,r=svg.getBoundingClientRect();
+  const vw=+hit.dataset.vw,L=+hit.dataset.l,w=+hit.dataset.w;
+  const vx=(e.clientX-r.left)/r.width*vw;
+  const i=Math.max(0,Math.min(13,Math.round((vx-L)/w*13)));
+  const x=L+w*i/13;const d=state.trend[i];
+  const cross=$('#cross');cross.setAttribute('x1',x);cross.setAttribute('x2',x);cross.setAttribute('visibility','visible');
+  const tip=$('#tip');tip.hidden=false;tip.style.left=(x/vw*r.width)+'px';tip.style.top='28px';
+  tip.textContent=d.d.toLocaleDateString('en-IN',{day:'numeric',month:'short'})+': '+d.n+' new, '+d.r+' resolved';
+}
+function trendLeave(){const c=$('#cross'),t=$('#tip');if(c)c.setAttribute('visibility','hidden');if(t)t.hidden=true;}
+
+function filtersHTML(){
+  const f=state.filters;
+  const opt=(arr,cur)=>arr.map(([v,l])=>'<option value="'+v+'"'+(v===cur?' selected':'')+'>'+esc(l)+'</option>').join('');
+  return '<div class="filters"><input type="search" class="q" data-f="q" placeholder="Search ID, area or text" value="'+esc(f.q)+'" aria-label="Search complaints">'+
+   '<select data-f="status" aria-label="Status">'+opt([['all','All statuses'],...Object.keys(STATUS_LABEL).map(k=>[k,STATUS_LABEL[k]])],f.status)+'</select>'+
+   '<select data-f="priority" aria-label="Priority">'+opt([['all','All priorities'],...PRI.slice().reverse().map(p=>[p,p])],f.priority)+'</select>'+
+   '<select data-f="cat" aria-label="Category">'+opt([['all','All categories'],...Object.keys(CATS).map(k=>[k,CATS[k].label])],f.cat)+'</select>'+
+   '<select data-f="sort" aria-label="Sort">'+opt([['priority','Highest priority first'],['newest','Newest first'],['oldest','Oldest first']],f.sort)+'</select></div>';
+}
+function queueHTML(){
+  const f=state.filters,dm=dupMap();const q=f.q.trim().toLowerCase();
+  let L=state.complaints.filter(c=>(f.status==='all'||c.status===f.status)&&(f.priority==='all'||c.priority===f.priority)&&(f.cat==='all'||c.category===f.cat)&&
+    (!q||(c.id+' '+c.area+' '+c.text+' '+c.catLabel).toLowerCase().includes(q)));
+  L.sort((a,b)=>f.sort==='newest'?b.createdAt-a.createdAt:f.sort==='oldest'?a.createdAt-b.createdAt:(open(b)-open(a))||rank(b.priority)-rank(a.priority)||a.createdAt-b.createdAt);
+  const qc=$('#qcount');if(qc)qc.textContent=L.length+' of '+state.complaints.length+' shown';
+  if(!L.length)return '<p class="empty" style="margin:12px">No complaints match these filters.</p>';
+  return '<table><thead><tr><th>ID</th><th>Complaint</th><th>Category</th><th>Priority</th><th>Status</th><th>Assigned to</th><th>Age</th></tr></thead><tbody>'+
+   L.map(c=>'<tr data-act="open" data-id="'+c.id+'"><td><button class="link" data-act="open" data-id="'+c.id+'">'+c.id+'</button></td>'+
+    '<td><span class="t">'+esc(c.title)+'</span><span class="sub">'+esc(c.area)+(c.reports>1?' · '+c.reports+' reports':'')+'</span>'+(dm[c.id]?' <span class="dupbadge">Possible duplicate of '+dm[c.id].id+'</span>':'')+'</td>'+
+    '<td>'+esc(c.catLabel)+'</td><td><span class="pill p-'+c.priority+'">'+c.priority+'</span></td><td><span class="pill s-'+c.status+'">'+STATUS_LABEL[c.status]+'</span></td>'+
+    '<td>'+(c.officer?esc(c.officer)+'<span class="sub"><br>'+esc(c.dept)+'</span>':'<span class="muted">Unassigned</span>')+'</td><td class="mono" style="white-space:nowrap">'+ago(c.createdAt)+'</td></tr>').join('')+'</tbody></table>';
+}
+function refreshQueue(){const q=$('#queue');if(q)q.innerHTML=queueHTML();}
+
+/* ----- detail modal ----- */
+function detailHTML(c){
+  const dups=findDuplicates(c,state.complaints,c.id);
+  const deptOpts='<option value="">Not assigned</option>'+Object.keys(DEPTS).map(d=>'<option value="'+esc(d)+'"'+(c.dept===d?' selected':'')+'>'+esc(d)+'</option>').join('');
+  const stOpts=Object.keys(STATUS_LABEL).map(k=>'<option value="'+k+'"'+(c.status===k?' selected':'')+'>'+STATUS_LABEL[k]+'</option>').join('');
+  return '<div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt" data-id="'+c.id+'">'+
+  '<div class="modal-h"><div class="stack" style="gap:8px"><div class="meta"><span class="mono">'+c.id+'</span><button class="btn small" data-act="copy" data-id="'+c.id+'">Copy ID</button><span class="pill p-'+c.priority+'">'+c.priority+'</span><span class="pill s-'+c.status+'">'+STATUS_LABEL[c.status]+'</span></div><h2 id="mt">'+esc(c.title)+'</h2></div><button class="btn small" data-act="closemodal" id="closebtn">Close</button></div>'+
+  '<div class="cols"><div class="stack"><div class="kv"><span class="k">Full description</span><p>'+esc(c.text)+'</p></div>'+
+   '<div class="kv"><span class="k">Reported</span><span>'+fmt(c.createdAt)+' · '+esc(c.area)+(c.reports>1?' · '+c.reports+' reports merged':'')+'</span><span class="small muted">'+(c.name||c.contact?esc(c.name)+(c.name&&c.contact?' · ':'')+esc(c.contact):'Reporter details not given')+'</span></div>'+
+   (c.img?'<img class="photo-big" src="'+c.img+'" alt="Photo attached to the complaint">':'')+'</div>'+
+   '<div class="box"><div class="kv"><span class="k">Analysis (rule-based)</span><span><b>'+esc(c.catLabel)+'</b> <span class="muted small">'+c.confidence.toLowerCase()+' confidence</span></span></div>'+
+   '<ul class="reasons">'+(c.reasons.length?c.reasons.map(r=>'<li><span class="pts">+'+r.pts+'</span><span>'+esc(r.text)+'</span></li>').join(''):'<li class="muted">No urgency signals found.</li>')+'</ul><span class="mono small">Score '+c.score+' = '+c.priority+'</span><p class="small">'+esc(c.summary)+'</p></div></div>'+
+  '<div class="box"><div class="kv"><span class="k">Possible duplicates</span></div>'+(dups.length?dups.map(d=>dupCard(d)+(c.status!=='duplicate'?'<div class="btns"><button class="btn small" data-act="markdup" data-id="'+c.id+'" data-of="'+d.id+'">Mark as duplicate of '+d.id+'</button><button class="btn small" data-act="open" data-id="'+d.id+'">View '+d.id+'</button></div>':'')).join(''):'<span class="hint">No similar open complaints found.</span>')+'</div>'+
+  '<div class="box"><div class="kv"><span class="k">Assign and update</span></div><div class="cols"><div class="field"><label for="m-dept">Department</label><select id="m-dept">'+deptOpts+'</select></div>'+
+   '<div class="field"><label for="m-off">Officer</label><select id="m-off"></select></div></div>'+
+   '<div class="cols"><div class="field"><label for="m-status">Status</label><select id="m-status">'+stOpts+'</select></div><div class="field"><label for="m-note">Note for the citizen (optional)</label><input type="text" id="m-note" placeholder="Example: Crew visits tomorrow morning"></div></div>'+
+   '<div class="btns"><button class="btn primary" data-act="saveupd" data-id="'+c.id+'">Save update</button></div></div>'+
+  '<div class="kv"><span class="k">History</span><ul class="timeline">'+c.history.slice().reverse().map(h=>'<li><b>'+STATUS_LABEL[h.status]+'</b><div>'+esc(h.note)+'</div><div class="when">'+fmt(h.t)+' · '+esc(h.by)+'</div></li>').join('')+'</ul></div></div>';
+}
+function fillOfficers(sel){
+  const d=$('#m-dept').value,c=get($('.modal').dataset.id);
+  const o=$('#m-off');o.innerHTML=d?'<option value="">Not assigned</option>'+DEPTS[d].map(n=>'<option value="'+esc(n)+'"'+(sel&&c.officer===n?' selected':'')+'>'+esc(n)+'</option>').join(''):'<option value="">Choose a department first</option>';
+  o.disabled=!d;
+}
+function openDetail(id){
+  const c=get(id);if(!c)return;
+  openModal(detailHTML(c));fillOfficers(true);
+  const cb=$('#closebtn');if(cb)cb.focus();
+}
+function saveUpdate(id){
+  const c=get(id);if(!c)return;
+  const dept=$('#m-dept').value,off=$('#m-off').value,st=$('#m-status').value,note=$('#m-note').value.trim();
+  const assignChanged=(dept!==c.dept||off!==c.officer);
+  const statusChanged=st!==c.status;
+  if(!assignChanged&&!statusChanged&&!note){toast('Nothing to update.');return;}
+  const t=Date.now();let msg=note;
+  if(assignChanged){c.dept=dept;c.officer=off;if(!msg)msg=off?'Assigned to '+off+', '+dept+'.':dept?'Routed to '+dept+'.':'Assignment cleared.';else if(off)msg='Assigned to '+off+'. '+msg;}
+  if(statusChanged&&!msg)msg=STEP_NOTE[st]||('Status changed to '+STATUS_LABEL[st]+'.');
+  c.status=st;c.history.push({t,status:st,note:msg,by:'Admin'});
+  saveStore();toast('Saved. '+c.id+' is now '+STATUS_LABEL[st]+'.');
+  openDetail(id);refreshAdmin();
+}
+function markDup(id,of){
+  const c=get(id),o=get(of);if(!c||!o)return;
+  c.status='duplicate';c.dupOf=of;o.reports=(o.reports||1)+(c.reports||1);
+  c.history.push({t:Date.now(),status:'duplicate',note:'Merged with '+of+' because it reports the same issue.',by:'Admin'});
+  saveStore();toast(id+' merged into '+of+'.');openDetail(id);refreshAdmin();
+}
+function refreshAdmin(){if(state.view==='admin'&&state.adminOk){const y=window.scrollY;render();window.scrollTo(0,y);}}
+
+/* ----- modal plumbing ----- */
+function openModal(html){
+  const r=$('#modal-root');r.innerHTML='<div class="overlay" data-act="overlay">'+html+'</div>';
+  document.body.style.overflow='hidden';
+}
+function closeModal(){$('#modal-root').innerHTML='';document.body.style.overflow='';}
+
+/* ----- render and events ----- */
+function render(){
+  document.querySelectorAll('[data-tab]').forEach(a=>{if(a.dataset.tab===state.view)a.setAttribute('aria-current','page');else a.removeAttribute('aria-current');});
+  const app=$('#app');
+  app.innerHTML=state.view==='report'?reportView():state.view==='track'?trackView():adminView();
+  if(state.view==='report'&&!state.success)updatePreview();
+  if(state.view==='admin'&&state.adminOk)refreshQueue();
+}
+function route(){
+  const h=(location.hash||'#report').slice(1);
+  state.view=['report','track','admin'].includes(h)?h:'report';
+  if(state.view!=='report')state.success=null;
+  closeModal();render();window.scrollTo(0,0);
+}
+const actions={
+  open:b=>openDetail(b.dataset.id),
+  closemodal:()=>closeModal(),
+  copy:b=>copyText(b.dataset.id),
+  again:()=>{state.success=null;state.img=null;render();},
+  'track-this':b=>{state.trackId=b.dataset.id;state.trackResult=b.dataset.id;state.success=null;if(location.hash==='#track')route();else location.hash='#track';},
+  sample:b=>{state.trackId=b.dataset.id;doTrack(b.dataset.id);const i=$('#tid');if(i)i.value=b.dataset.id;},
+  merge:b=>{if(state.pending)createComplaint(state.pending,b.dataset.id);},
+  submitnew:()=>{if(state.pending)createComplaint(state.pending,null);},
+  layer:b=>{state.layer=b.dataset.l;refreshAdmin();},
+  saveupd:b=>saveUpdate(b.dataset.id),
+  markdup:b=>markDup(b.dataset.id,b.dataset.of),
+  logout:()=>{state.adminOk=false;try{sessionStorage.removeItem('nmc-admin');}catch(e){}render();},
+  reset:()=>{state.complaints=buildSeeds();saveStore();toast('Sample data restored.');render();}
+};
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-act]');
+  if(b){
+    if(b.dataset.act==='overlay'){if(e.target===b)closeModal();return;}
+    const fn=actions[b.dataset.act];if(fn){fn(b,e);}
+    return;
+  }
+  const pm=e.target.closest('#pickmap');
+  if(pm){
+    const r=pm.getBoundingClientRect();
+    const x=Math.max(0.2,Math.min(9.8,(e.clientX-r.left)/r.width*10)),y=Math.max(0.2,Math.min(7.8,(e.clientY-r.top)/r.height*8));
+    state.pin={x,y};$('#pin').setAttribute('transform','translate('+x*100+' '+y*100+')');
+    const a=nearestArea(x,y);$('#area').value=a.k;$('#pinnote').textContent='Pinned near '+a.n+'. Click the map to move the pin.';updatePreview();
+  }
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape')closeModal();
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.pin')){e.preventDefault();openDetail(e.target.dataset.id);}
+});
+let ptimer;
+document.addEventListener('input',e=>{
+  if(e.target.closest('#f')){
+    if(e.target.id==='desc'){const n=e.target.value.trim().length;$('#count').textContent=n<20?'Write at least 20 characters. Details such as how long it has been going on help set the priority.':n+' characters';}
+    clearTimeout(ptimer);ptimer=setTimeout(updatePreview,140);
+  }
+  if(e.target.dataset&&e.target.dataset.f==='q'){state.filters.q=e.target.value;clearTimeout(ptimer);ptimer=setTimeout(refreshQueue,120);}
+});
+document.addEventListener('change',async e=>{
+  const t=e.target;
+  if(t.id==='area'){const a=AREAS.find(x=>x.k===t.value);state.pin={x:a.x,y:a.y};$('#pin').setAttribute('transform','translate('+a.x*100+' '+a.y*100+')');$('#pinnote').textContent='Pinned near '+a.n+'. Click the map to move the pin.';updatePreview();}
+  else if(t.id==='cat')updatePreview();
+  else if(t.id==='photo'){
+    const f=t.files&&t.files[0];const w=$('#thumbwrap');
+    if(!f){state.img=null;w.innerHTML='';return;}
+    try{state.img=await readImage(f);w.innerHTML='<img class="thumb" src="'+state.img+'" alt="Selected photo preview">';}
+    catch(err){state.img=null;w.innerHTML='<span class="hint">Could not read that image. Try a JPG or PNG.</span>';}
+  }
+  else if(t.dataset&&t.dataset.f){state.filters[t.dataset.f]=t.value;refreshQueue();}
+  else if(t.id==='m-dept'){fillOfficers(false);const st=$('#m-status');if(t.value&&(st.value==='new'||st.value==='review'))st.value='assigned';}
+  else if(t.id==='m-off'){const st=$('#m-status');if(t.value&&(st.value==='new'||st.value==='review'))st.value='assigned';}
+});
+document.addEventListener('submit',e=>{
+  e.preventDefault();
+  if(e.target.id==='f')submitForm();
+  else if(e.target.id==='tf')doTrack($('#tid').value);
+  else if(e.target.id==='lf'){
+    if($('#pin').value.trim()==='1234'){state.adminOk=true;try{sessionStorage.setItem('nmc-admin','1');}catch(x){}render();}
+    else $('#lerr').textContent='That PIN is not correct. The demo PIN is 1234.';
+  }
+});
+document.addEventListener('pointermove',trendMove);
+document.addEventListener('pointerleave',trendLeave,true);
+window.addEventListener('hashchange',route);
+
+state.complaints=loadStore()||buildSeeds();
+saveStore();
+try{state.adminOk=sessionStorage.getItem('nmc-admin')==='1';}catch(e){}
+route();
+</script>
+
+</body></html>
